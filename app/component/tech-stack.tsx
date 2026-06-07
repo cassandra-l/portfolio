@@ -30,25 +30,24 @@ export function TechStackContent() {
       {SKILL_GROUPS.map((group, groupIndex) => (
         <div key={group.title} className="space-y-3">
           {/* Category Title label */}
-          <h3 className="text-[11px] font-mono uppercase tracking-widest opacity-40 text-[#a67c52] dark:text-slate-400">
+          <h3 className="text-[11px] font-mono uppercase tracking-widest opacity-60 text-[#a67c52] dark:text-slate-400">
             // {group.title}
           </h3>
 
-          {/* Flex wrap container for the pills */}
+          {/* Container for the pills */}
           <div className="flex flex-wrap gap-3">
             {group.skills.map((skill, skillIndex) => (
               <motion.span
                 key={skill}
-                // 1. Initial position is shifted up off-screen/high up, and completely invisible
+                // Initial position is shifted up off-screen
                 initial={{ opacity: 0, y: -40 }}
-                // 2. Animate falls down into place perfectly
+                // Animate falls down into place
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
                   type: "spring",
                   stiffness: 140,
                   damping: 14,
-                  // 3. Stagger delay calculation mixes the group index and skill index
-                  // so they fall row-by-row in a beautiful fluid cascade
+                  // Delay calculation so groups fall row by row
                   delay: groupIndex * 0.12 + skillIndex * 0.04,
                 }}
                 // Premium editorial style pill layout

@@ -4,15 +4,26 @@ import { Mail } from "lucide-react";
 import { Github, Linkedin } from "../component/icon";
 import { PortfolioContent } from "./portfolio";
 import { TechStackContent } from "./tech-stack";
+import { useSearchParams } from "react-router";
+import { ExperienceContent } from "./experience";
 
 export function Intro() {
   const textToType = "hello world!";
   const [displayedText, setDisplayedText] = useState("");
-  const [isIntroComplete, setIsIntroComplete] = useState(false);
-  const [activeTab, setActiveTab] = useState("about");
+  const [isIntroComplete, setIsIntroComplete] = useState(() => {
+    return sessionStorage.getItem("introPlayed") === "true";
+  });
 
-  // Handle Terminal Typing Effect & Trigger Curtain Slide Up
+  // Search Params hook
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Get the '?tab=' value from the URL. If it's empty, default straight to "about"
+  const activeTab = searchParams.get("tab") || "about";
+
+  // Terminal Typing Effect & Curtain Slide Up Logic
   useEffect(() => {
+    if (isIntroComplete) return;
+
     let index = 0;
     setDisplayedText("");
 
@@ -23,8 +34,8 @@ export function Intro() {
       if (index >= textToType.length) {
         clearInterval(interval);
 
-        // Wait 1.5 seconds after "hello world!" finishes typing, then pull the curtain up
         const curtainTimeout = setTimeout(() => {
+          sessionStorage.setItem("introPlayed", "true");
           setIsIntroComplete(true);
         }, 1000);
 
@@ -33,11 +44,19 @@ export function Intro() {
     }, 140);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isIntroComplete]);
+
+  // Define navigation structure u
+  const tabs = [
+    { id: "about", label: "about" },
+    { id: "tech-stack", label: "tech stack" },
+    { id: "portfolio", label: "portfolio" },
+    { id: "experience", label: "experience" },
+  ];
 
   return (
     <div className="relative h-screen w-screen overflow-hidden select-none transition-colors duration-500 bg-[#fcfaf7] dark:bg-slate-950">
-      {/* ================= PHASE 1: THE INTRO CURTAIN ================= */}
+      {/*Intro curtain */}
       <AnimatePresence>
         {!isIntroComplete && (
           <motion.div
@@ -45,16 +64,13 @@ export function Intro() {
             initial={{ y: 0 }}
             exit={{ y: "-100%" }}
             transition={{ duration: 0.85, ease: [0.76, 0, 0.24, 1] }}
-            // Added transition-colors and dark classes here:
             className="absolute inset-0 z-50 flex flex-col items-center justify-center p-8 bg-[#fcfaf7] dark:bg-slate-950"
           >
             <div className="flex items-center tracking-tight font-mono font-bold text-5xl md:text-7xl lg:text-8xl">
-              {/* Swapped inline styles for text-current or responsive dark classes */}
               <span className="text-[#a67c52] dark:text-amber-400 transition-colors duration-500">
                 {displayedText}
               </span>
 
-              {/* The terminal cursor color matches the dark mode variant too */}
               <motion.div
                 animate={{ opacity: [1, 0, 1] }}
                 transition={{
@@ -69,51 +85,50 @@ export function Intro() {
         )}
       </AnimatePresence>
 
-      {/* Main Landing Page*/}
+      {/* Main page */}
       <motion.main
         initial={{ opacity: 0 }}
         animate={{ opacity: isIntroComplete ? 1 : 0 }}
         transition={{ delay: 0.4, duration: 0.6 }}
-        className="mx-auto grid h-full w-full max-w-5xl grid-cols-1 gap-8 px-8 items-center md:grid-cols-[1fr_2.5fr] lg:px-16 text-[#a67c52] dark:text-slate-200 transition-colors duration-500"
+        className="grid h-full w-full max-w-6xl grid-cols-1 gap-8 px-8 items-center md:grid-cols-[1fr_2.5fr] lg:pl-16 pr-20 text-[#a67c52] dark:text-slate-200 transition-colors duration-500 ml-0 md:ml-[max(2rem,calc((100vw-64rem)/2))]"
       >
         {/* Left Container */}
         <div className="relative flex flex-col h-fit justify-center">
-          {/* Navigation Tabs */}
           <nav className="flex flex-col space-y-6">
-            {["about", "tech stack", "portfolio", "resume"].map((tab) => {
-              const isActive = activeTab === tab;
+            {tabs.map(({ id, label }) => {
+              const isActive = activeTab === id;
+
               return (
                 <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className="group flex items-center text-left focus:outline-none uppercase tracking-widest text-xs font-bold transition-all duration-300 dark:text-current cursor-pointer"
+                  key={id}
+                  // Update the URL query params when clicked
+                  onClick={() => {
+                    if (id === "about") {
+                      setSearchParams({});
+                    } else {
+                      // change url to /?tab
+                      setSearchParams({ tab: id });
+                    }
+                  }}
+                  className="group flex items-center text-left uppercase tracking-widest text-xs font-bold transition-all duration-300 focus:outline-none cursor-pointer"
                   style={{ color: "#a67c52" }}
                 >
-                  {/* Sliding Line Indicator */}
                   <span
-                    // The line still reacts beautifully (w-6 -> w-9 -> w-12), but its opacity stays locked
                     className={`h-[1px] transition-all duration-300 ease-out mr-4 ${
                       isActive
                         ? "w-12 opacity-100 bg-[#a67c52] dark:bg-slate-200"
                         : "w-6 opacity-35 group-hover:w-9 bg-[#a67c52]/60 dark:bg-slate-400"
                     }`}
-                    style={{
-                      backgroundColor: isActive ? "#a67c52" : undefined,
-                    }}
                   />
 
-                  {/* Tab Text */}
                   <span
                     className={`transition-all duration-300 ease-in-out ${
                       isActive
                         ? "opacity-100 tracking-widest text-[#a67c52] dark:text-slate-100"
                         : "opacity-60 text-[#a67c52]/90 dark:text-slate-400"
                     }`}
-                    style={{
-                      color: isActive ? "#a67c52" : undefined,
-                    }}
                   >
-                    {tab}
+                    {label}
                   </span>
                 </button>
               );
@@ -126,7 +141,7 @@ export function Intro() {
             style={{ color: "#a67c52" }}
           >
             <a
-              href="https://github.com"
+              href="https://github.com/cassandra-l"
               target="_blank"
               rel="noreferrer"
               className="opacity-60 hover:opacity-100 transition-opacity duration-200"
@@ -134,7 +149,7 @@ export function Intro() {
               <Github size={18} />
             </a>
             <a
-              href="https://linkedin.com"
+              href="https://www.linkedin.com/in/cassandra-lzc/"
               target="_blank"
               rel="noreferrer"
               className="opacity-60 hover:opacity-100 transition-opacity duration-200"
@@ -142,7 +157,7 @@ export function Intro() {
               <Linkedin size={18} />
             </a>
             <a
-              href="mailto:your.email@example.com"
+              href="mailto:zhicheng1224@gmail.com"
               className="opacity-60 hover:opacity-100 transition-opacity duration-200"
             >
               <Mail size={18} />
@@ -150,8 +165,7 @@ export function Intro() {
           </div>
         </div>
 
-        {/* Right Column */}
-        {/* Right Column */}
+        {/* Right Column Workspace */}
         <div className="flex flex-col h-fit justify-center max-w-full md:pl-8 w-full">
           <AnimatePresence mode="wait">
             {activeTab === "about" && (
@@ -173,8 +187,7 @@ export function Intro() {
               </motion.div>
             )}
 
-            {/* Tech stack content */}
-            {activeTab === "tech stack" && (
+            {activeTab === "tech-stack" && (
               <motion.div
                 key="tech-stack-workspace"
                 initial={{ opacity: 0, x: 20 }}
@@ -187,7 +200,6 @@ export function Intro() {
               </motion.div>
             )}
 
-            {/* LOAD THE NEW SCROLLABLE PROJECTS ELEMENT */}
             {activeTab === "portfolio" && (
               <motion.div
                 key="portfolio-workspace"
@@ -195,24 +207,22 @@ export function Intro() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.4 }}
-                className="w-[130%]"
+                className="w-[110%]"
               >
                 <PortfolioContent />
               </motion.div>
             )}
 
-            {/* Keep your generic layout fallback tabs placeholder frames safely updated below */}
-            {activeTab !== "about" && activeTab !== "portfolio" && (
+            {activeTab === "experience" && (
               <motion.div
-                key="fallback-content"
+                key="experience-workspace"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.4 }}
-                className="text-sm italic opacity-40 font-mono dark:text-slate-400"
-                style={{ color: "#a67c52" }}
+                className="w-full"
               >
-                //{activeTab} content frame container...
+                <ExperienceContent />
               </motion.div>
             )}
           </AnimatePresence>

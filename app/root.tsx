@@ -1,5 +1,6 @@
 import {
   isRouteErrorResponse,
+  Link,
   Links,
   Meta,
   Outlet,
@@ -34,6 +35,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        {/* <header className="fixed top-0 left-0 p-6 z-50">
+          <Link to="/">
+            <img
+              src="/portfolio-logo.png"
+              alt="Logo"
+              className="w-12 h-12 object-contain"
+            />
+          </Link>
+        </header> */}
         <PullCord />
         {children}
         <ScrollRestoration />
