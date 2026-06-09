@@ -8,7 +8,7 @@ export function PullCord() {
 
   return (
     <motion.div
-      className="fixed top-0 right-5 flex flex-col items-center z-50 cursor-pointer"
+      className="fixed top-0 sm:right-5 flex flex-col items-center z-50 cursor-pointer right-3"
       onPointerDown={() => setIsPulled(true)}
       onPointerUp={() => {
         setIsPulled(false);
