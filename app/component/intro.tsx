@@ -165,7 +165,7 @@ export function Intro() {
         </a>
 
         <a
-          href="mailto:zhicheng1224@gmail.com"
+          href="mailto:hi@casslee.dev"
           className="opacity-60 hover:opacity-100 transition-opacity duration-200"
         >
           <Mail size={20} />
